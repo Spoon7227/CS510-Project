@@ -1,0 +1,3 @@
+[submodule "react-app/react-app/frontend"]
+	path = react-app/react-app/frontend
+	url = https://github.com/Spoon7227/CS510-Project/
