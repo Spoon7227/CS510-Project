@@ -10,18 +10,23 @@ function Main() {
   const [notesContent, setNotesContent] = useState('');
 
   const fetchResponse = async () => {
-    // !!! TODO !!!
+    // TODO
     // Send user input to backend 
     // Set content with returned result
 
-    setTranscriptContent('');
-    setNotesContent('');
+
+    // On complete
+    // setTranscriptContent('');
+    // setNotesContent('');
+    // setHasContent(true);
+    // setIsGenerating(false);
   }
 
-  const handleClick = () => {
-    // Temporary: Remove when user input / fetch response is complete
+  const handleGenerateClick = () => {
+    // Remove when user input / fetch response is complete
     setHasContent(true);
 
+    // Opens user input UI
     setIsGenerating(true);
   }
 
@@ -29,7 +34,7 @@ function Main() {
     <div className="main">
       <div className="title">
         <h4>NoteScribe</h4>
-        <button className="generate-button title" onClick={handleClick}>
+        <button className="generate-button title" onClick={handleGenerateClick}>
             +
         </button>
       </div>
@@ -49,11 +54,16 @@ function Main() {
           ) : (
             <div className="intro">
               <p className="guide-text">Click to get started</p>
-              <button className="generate-button" onClick={handleClick}>
+              <button className="generate-button" onClick={handleGenerateClick}>
                 Generate Notes
               </button>
             </div>
           )
+        )}
+
+        {isGenerating && (
+          // TODO: Add input window and call fetchResponse with user input 
+          null
         )}
       </div>
     </div>
