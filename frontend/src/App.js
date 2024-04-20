@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import Main from './components/Main';
 
 function App() {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('hi');
 
   useEffect(() => {
     fetch('http://localhost:5001/api/message')
@@ -13,7 +14,7 @@ function App() {
   return (
       <div className="App">
         <header className="App-header">
-          <h1>{message}</h1>
+          <Main/>
         </header>
       </div>
   );
