@@ -5,21 +5,17 @@ import Section from "./Section"
 import './styles/Main.css'
 
 function Main() {
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasContent, setHasContent] = useState(false);
+  const [isInputing, setIsInputing] = useState(false);
 
   const [transcriptContent, setTranscriptContent] = useState('');
   const [notesContent, setNotesContent] = useState('');
 
-  const fetchResponse = async (formData) => {
-    // TODO
-    // Send user input to backend 
-    // Set content with returned result
-    // On complete
-    // setTranscriptContent('');
-    // setNotesContent('');
-    // setHasContent(true);
-    // setIsGenerating(false);
+  const handleFetchResponse = async (formData) => {
+    // TODO: Remove when API complete
+    setHasContent(true);
+    setIsLoading(false);
 
     try {
       const response = await axios.post('/upload', formData, {
@@ -31,18 +27,16 @@ function Main() {
       setTranscriptContent(response.data.transcript);
       setNotesContent(response.data.notes);
       setHasContent(true);
-      setIsGenerating(false);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching response: ', error);
     }
   }
 
   const handleGenerateClick = () => {
-    // Remove when user input / fetch response is complete
-    setHasContent(true);
-
     // Opens user input UI
-    setIsGenerating(true);
+    setIsInputing(true);
+    setIsLoading(true);
   }
 
   return (
@@ -58,11 +52,11 @@ function Main() {
           <Section
             transcript={transcriptContent}
             notes={notesContent}
-            onTranscriptChange={setTranscriptContent}
-            onNotesChange={setNotesContent}
+            setTranscriptContent={setTranscriptContent}
+            setNotesContent={setNotesContent}
           />
         ) : (
-          isGenerating ? (
+          isLoading ? (
             <div className="intro">
               <p className="guide-text">Loading...</p>
             </div> 
@@ -75,10 +69,9 @@ function Main() {
             </div>
           )
         )}
-
-        {isGenerating && (
+        {isInputing && (
           // TODO: Add input window and call fetchResponse with user input 
-          <InputForm fetchResponse={fetchResponse} /> 
+          <InputForm className="input-form" setIsInputing={setIsInputing} handleFetchResponse={handleFetchResponse} /> 
         )}
       </div>
     </div>

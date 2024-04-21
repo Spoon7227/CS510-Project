@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './styles/InputForm.css'; 
 
-function InputForm() {
+function InputForm({ className, setIsInputing, handleFetchResponse }) {
   const [choice, setChoice] = useState('');
   const [keywords, setKeywords] = useState('');
   const [inputType, setInputType] = useState('upload');
@@ -40,20 +40,12 @@ function InputForm() {
       formData.append('link', link);
     }
 
-    try {
-      const response = await axios.post('/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error uploading file: ', error);
-    }
+    handleFetchResponse(formData);
+    setIsInputing(false)
   };
 
   return (
-    <div>
+    <div className={className}>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="choice">Prompt Choice:</label>
@@ -66,7 +58,7 @@ function InputForm() {
         </div>
         <div>
           <label htmlFor="keywords">Keywords:</label>
-          <input type="text" id="keywords" value={keywords} onChange={handleKeywordsChange} />
+          <input type="text" id="keywords" value={keywords} onChange={handleKeywordsChange} placeholder="Comma seperated Keywords"/>
         </div>
         <div>
           <label htmlFor="inputType">Input Type:</label>
