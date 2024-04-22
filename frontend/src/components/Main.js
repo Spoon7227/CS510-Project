@@ -36,7 +36,6 @@ function Main() {
   const handleGenerateClick = () => {
     // Opens user input UI
     setIsInputing(true);
-    setIsLoading(true);
   }
 
   return (
@@ -70,8 +69,9 @@ function Main() {
           )
         )}
         {isInputing && (
-          // TODO: Add input window and call fetchResponse with user input 
-          <InputForm className="input-form" setIsInputing={setIsInputing} handleFetchResponse={handleFetchResponse} /> 
+          <div className="blur">
+            <InputForm className="input-form" setIsInputing={setIsInputing} handleFetchResponse={handleFetchResponse} /> 
+          </div>
         )}
       </div>
     </div>

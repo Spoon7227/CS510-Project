@@ -29,6 +29,10 @@ function InputForm({ className, setIsInputing, handleFetchResponse }) {
     setLink(event.target.value);
   };
 
+  const handleCancelClick = () => {
+    setIsInputing(false);
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData();
@@ -41,7 +45,7 @@ function InputForm({ className, setIsInputing, handleFetchResponse }) {
     }
 
     handleFetchResponse(formData);
-    setIsInputing(false)
+    setIsInputing(false);
   };
 
   return (
@@ -72,7 +76,10 @@ function InputForm({ className, setIsInputing, handleFetchResponse }) {
             <input type="text" value={link} onChange={handleLinkChange} placeholder="Enter your link here" />
           )}
         </div>
-        <button type="submit">Submit</button>
+        <div className="button-group">
+          <button className="cancel-button" type="cancel" onClick={handleCancelClick}>Cancel</button>
+          <button type="submit">Submit</button>
+        </div>
       </form>
     </div>
   );
