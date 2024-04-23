@@ -1,0 +1,15 @@
+.section {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+    width: 100%;
+}
+
+.transcript,
+.notes {
+  flex: 1;
+  overflow: auto; 
+  resize: none; 
+  border-radius: 8px;
+  padding: 20px;
+}
