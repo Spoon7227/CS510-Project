@@ -1,0 +1,88 @@
+# from pytube import YouTube
+# import os
+# from openai import OpenAI
+# import config
+
+# url = 'https://www.youtube.com/watch?v=3cGYEjQuCKc'
+
+# yt = YouTube(url)
+
+# audio_streams = yt.streams.filter(only_audio=True, file_extension='webm').first()
+
+# if audio_streams:
+#     filename = 'downloaded_video.webm'
+    
+#     filesize = audio_streams.filesize
+    
+#     audio_streams.download(filename=filename)
+
+#     client = OpenAI(api_key=config.API_KEY)
+
+#     with open(filename, "rb") as audio_file:
+#         transcription = client.audio.transcriptions.create(model="whisper-1", file=audio_file)
+        
+#         text = transcription.text
+        
+#         print(text)
+# else:
+#     print("No suitable audio stream found.")
+
+from pytube import YouTube
+from pydub import AudioSegment
+from openai import OpenAI
+import config
+import os
+
+def download_youtube_audio(url, filename):
+    yt = YouTube(url)
+    audio_streams = yt.streams.filter(only_audio=True).first()
+
+    if audio_streams:
+        audio_streams.download(filename=filename)
+        return True
+    else:
+        print("No suitable audio stream found.")
+        return False
+
+def transcribe_audio(filename):
+    client = OpenAI(api_key=config.API_KEY)
+
+    with open(filename, "rb") as audio_file:
+        transcription = client.audio.transcriptions.create(model="whisper-1", file=audio_file)
+        text = transcription.text
+        
+        return text
+
+def main():
+    print("Welcome to the Audio Transcription Tool!")
+    print("Choose the input type:")
+    print("1. YouTube Link")
+    print("2. MP3 File")
+
+    choice = input("Enter your choice (1 or 2): ")
+
+    if choice == '1':
+        youtube_url = input("Enter the YouTube video URL: ")
+        filename = 'downloaded_audio.webm'
+        if download_youtube_audio(youtube_url, filename):
+            print("Audio downloaded successfully.")
+            transcript = transcribe_audio(filename)
+            print("Transcription:")
+            print(transcript)
+        else:
+            print("Failed to download audio.")
+    elif choice == '2':
+        mp3_file = input("Enter the path to the MP3 file: ")
+        if os.path.exists(mp3_file):
+            filename = 'audio.mp3'
+            os.rename(mp3_file, filename)  
+            transcript = transcribe_audio(filename)
+            print("Transcription:")
+            print(transcript)
+        else:
+            print("MP3 file not found.")
+    else:
+        print("Invalid choice. Please choose either 1 or 2.")
+
+if __name__ == "__main__":
+    main()

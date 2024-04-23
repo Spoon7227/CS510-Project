@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Main from './components/Main';
 
 function App() {
-  const [message, setMessage] = useState('hi');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:5001/api/message')
