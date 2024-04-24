@@ -4,9 +4,10 @@ import os
 from openai import OpenAI
 import config
 from moviepy.editor import AudioFileClip
-import io
 import tempfile
-
+import json
+import logging
+logging.getLogger("moviepy").setLevel(logging.ERROR)
 # Function to transcribe audio using OpenAI API
 def transcribe_audio_with_openai(audio_file_path):
     # Initialize the OpenAI client
@@ -81,7 +82,7 @@ def process_audio_file(audio_clip, notes_type, chunk_length=60):
 
         # Save the chunk to a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmpfile:
-            chunk_audio_clip.write_audiofile(tmpfile.name, codec='pcm_s16le')
+            chunk_audio_clip.write_audiofile(tmpfile.name, codec='pcm_s16le', verbose=False, logger=None)
             chunk_transcript = transcribe_audio_with_openai(tmpfile.name)
             os.unlink(tmpfile.name)  # Delete the temp file after transcription
 
@@ -98,11 +99,11 @@ def process_audio_file(audio_clip, notes_type, chunk_length=60):
     else:
         notes = "Invalid notes type choice."
 
-    # Display final transcript and notes
-    print("\nFinal Transcript:")
-    print(transcript)
-    print("\nFinal Notes:")
-    print(notes)
+    # Return the transcript and notes as JSON data
+    return {
+        "transcript": transcript,
+        "notes": notes
+    }
 
 # Function to process YouTube URL and generate transcripts
 def process_youtube_link(url, notes_type):
@@ -119,9 +120,8 @@ def process_youtube_link(url, notes_type):
 
             # Process audio file in chunks
             audio_clip = AudioFileClip(file_path)
-            process_audio_file(audio_clip, notes_type)
+            return process_audio_file(audio_clip, notes_type)
 
-            # The temporary directory and its contents are automatically cleaned up
     else:
         print("No suitable audio stream found.")
 
@@ -135,11 +135,13 @@ if __name__ == "__main__":
         audio_file_path = sys.argv[2]
         notes_type = sys.argv[3]
         audio_clip = AudioFileClip(audio_file_path)
-        process_audio_file(audio_clip, notes_type)
+        result = process_audio_file(audio_clip, notes_type)
     elif choice == '2':
         url = sys.argv[2]
         notes_type = sys.argv[3]
-        process_youtube_link(url, notes_type)
+        result = process_youtube_link(url, notes_type)
     else:
         print("Invalid choice.")
 
+    # Print the JSON result
+    print(json.dumps(result))
