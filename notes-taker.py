@@ -1,7 +1,8 @@
 from pytube import YouTube
 import os
 from openai import OpenAI
-import config
+from backend import config
+
 
 # Function to transcribe audio using OpenAI API
 def transcribe_audio_with_openai(audio_file_path):

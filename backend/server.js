@@ -1,8 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const multer = require('multer');
 const { spawn } = require('child_process');
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send('Hello from the backend!');
@@ -30,7 +33,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     const input = link || './uploads/audio.mp3';
 
     // Call Python script (inputType, link or audio path, prompt_choice, keywords)
-    const pythonProcess = spawn('python3', ['transcribe_audio.py', inputType, input, prompt_choice, keywords]);
+    const pythonProcess = spawn('python3', ['transcribe_audio.py', inputType, input, prompt_choice]);
 
     let responseData = '';
     pythonProcess.stdout.on('data', (data) => {
