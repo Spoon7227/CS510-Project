@@ -13,23 +13,21 @@ function Main() {
   const [notesContent, setNotesContent] = useState('');
 
   const handleFetchResponse = async (formData) => {
-    // TODO: Remove when API complete
-    setHasContent(true);
-    setIsLoading(false);
+    setIsLoading(true);
 
     try {
-      const response = await axios.post('/upload', formData, {
+      const response = await axios.post('http://localhost:5001/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      // Assuming response contains transcript and notes content
-      setTranscriptContent(response.data.transcript);
-      setNotesContent(response.data.notes);
+      setTranscriptContent(response.data.data.transcript);
+      setNotesContent(response.data.data.notes);
       setHasContent(true);
-      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching response: ', error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
