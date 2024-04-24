@@ -35,7 +35,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     let responseData = '';
     pythonProcess.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);
-        outputData += data.toString();
+        responseData += data.toString();
     });
 
     pythonProcess.stderr.on('data', (data) => {
