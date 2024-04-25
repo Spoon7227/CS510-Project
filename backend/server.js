@@ -33,7 +33,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     const input = link || './uploads/audio.mp3';
 
     // Call Python script (inputType, link or audio path, prompt_choice, keywords)
-    const pythonProcess = spawn('python3', ['transcribe_audio.py', inputType, input, prompt_choice]);
+    const pythonProcess = spawn('python3', ['transcribe_audio.py', inputType, input, prompt_choice, keywords]);
 
     let responseData = '';
     pythonProcess.stdout.on('data', (data) => {

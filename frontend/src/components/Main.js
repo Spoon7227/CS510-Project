@@ -14,6 +14,7 @@ function Main() {
 
   const handleFetchResponse = async (formData) => {
     setIsLoading(true);
+    setHasContent(false);
 
     try {
       const response = await axios.post('http://localhost:5001/upload', formData, {

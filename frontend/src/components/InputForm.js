@@ -55,9 +55,9 @@ function InputForm({ className, setIsInputing, handleFetchResponse }) {
           <label htmlFor="choice">Prompt Choice:</label>
           <select id="choice" value={choice} onChange={handleChoiceChange}>
             <option value="">Select</option>
-            <option value="1">Detailed Summary</option>
-            <option value="2">Concise bullet points</option>
-            <option value="3">Choice 3</option>
+            <option value="1">Meeting Notes</option>
+            <option value="2">Lecture Notes</option>
+            {/*<option value="3">Choice 3</option>*/}
           </select>
         </div>
         <div>
