@@ -45,6 +45,27 @@ def generate_notes(user_input, prompt):
     # Return the generated notes
     return completion.choices[0].message.content
 
+def correct_keywords(user_input, keywords):
+    # Initialize the OpenAI client
+    client = OpenAI(api_key=config.API_KEY)
+
+    prompt = "Please ensure that all occurances of the following keywords are spelled exactly as given, maintaining exact case sensitivity: " + keywords + ". For example: \nTranscript: 'I like apple and water guns.'\nKeywords: [APPLE, WaterGuns]\n Expected Output: 'I like APPLE and WaterGuns.'"
+
+    # Define the prompt with the system message and user query
+    prompt = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": user_input}
+    ]
+
+    # Generate completion
+    completion = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=prompt
+    )
+
+    # Return the generated notes
+    return completion.choices[0].message.content
+
 # Function to process audio file and generate transcripts
 def process_audio_file(audio_clip, notes_type, keywords, chunk_length=60):
     chunks_transcript = []
@@ -68,6 +89,11 @@ def process_audio_file(audio_clip, notes_type, keywords, chunk_length=60):
 
     # Concatenate all chunks into a single transcript
     transcript = "\n".join(chunks_transcript)
+
+    # Post-process transcript with keywords
+    if len(keywords) > 0:
+        transcript = correct_keywords(transcript, keywords)
+
 
     # Generate notes based on the chosen type
     if notes_type == '1':
