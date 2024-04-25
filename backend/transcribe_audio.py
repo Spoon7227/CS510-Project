@@ -9,7 +9,7 @@ import json
 import logging
 logging.getLogger("moviepy").setLevel(logging.ERROR)
 # Function to transcribe audio using OpenAI API
-def transcribe_audio_with_openai(audio_file_path):
+def transcribe_audio_with_openai(audio_file_path, keywords):
     # Initialize the OpenAI client
     client = OpenAI(api_key=config.API_KEY)
 
@@ -18,20 +18,21 @@ def transcribe_audio_with_openai(audio_file_path):
         # Transcribe
         transcription = client.audio.transcriptions.create(
             model="whisper-1",
-            file=audio_file
+            file=audio_file,
+            prompt=keywords
         )
 
     # Return the transcribed text
     return transcription.text
 
-# Function to generate detailed notes using OpenAI Chat API
-def generate_detailed_notes(user_input):
+# Function to generate notes using OpenAI Chat API
+def generate_notes(user_input, prompt):
     # Initialize the OpenAI client
     client = OpenAI(api_key=config.API_KEY)
 
     # Define the prompt with the system message and user query
     prompt = [
-        {"role": "system", "content": "You are a knowledgeable assistant, capable of summarizing complex concepts with clarity."},
+        {"role": "system", "content": prompt},
         {"role": "user", "content": user_input}
     ]
 
@@ -41,34 +42,11 @@ def generate_detailed_notes(user_input):
         messages=prompt
     )
 
-    # Return the generated detailed notes
+    # Return the generated notes
     return completion.choices[0].message.content
 
-# Function to generate short bullet points using OpenAI Chat API
-def generate_bullet_points(user_input):
-    # Initialize the OpenAI client
-    client = OpenAI(api_key=config.API_KEY)
-
-    # Define the prompt with the system message and user query
-    prompt = [
-        {"role": "system", "content": "You are a knowledgeable assistant, capable of summarizing complex concepts with clarity."},
-        {"role": "user", "content": user_input},
-        {"role": "system", "content": "Please provide concise bullet points summarizing the main points."}  # Instruction for concise notes
-    ]
-
-    # Generate completion
-    completion = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=prompt
-    )
-
-    # Process the response into bullet points
-    response = completion.choices[0].message.content
-    # bullet_points = "- " + response.replace("\n", "\n- ")  # Add bullet points
-    return response
-
 # Function to process audio file and generate transcripts
-def process_audio_file(audio_clip, notes_type, chunk_length=60):
+def process_audio_file(audio_clip, notes_type, keywords, chunk_length=60):
     chunks_transcript = []
     total_duration = audio_clip.duration
 
@@ -83,7 +61,7 @@ def process_audio_file(audio_clip, notes_type, chunk_length=60):
         # Save the chunk to a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmpfile:
             chunk_audio_clip.write_audiofile(tmpfile.name, codec='pcm_s16le', verbose=False, logger=None)
-            chunk_transcript = transcribe_audio_with_openai(tmpfile.name)
+            chunk_transcript = transcribe_audio_with_openai(tmpfile.name, keywords)
             os.unlink(tmpfile.name)  # Delete the temp file after transcription
 
         chunks_transcript.append(chunk_transcript)
@@ -93,9 +71,37 @@ def process_audio_file(audio_clip, notes_type, chunk_length=60):
 
     # Generate notes based on the chosen type
     if notes_type == '1':
-        notes = generate_detailed_notes(transcript)
+        prompt = f"""
+        Provide meeting notes in the below format for a meeting transcript.
+        
+        Meeting Summary:
+        -
+        Action items:
+        - 
+        New ideas:
+        - 
+        Questions Raised:
+        - 
+        Decisions Made:
+        - 
+        """
+        notes = generate_notes(transcript, prompt)
+
     elif notes_type == '2':
-        notes = generate_bullet_points(transcript)
+        prompt = f"""
+        Provide notes in the below format for a lecture transcript.
+        
+        Lecture Overview:
+        -    
+        Section summaries:
+        - 
+        Key concepts and definitions:
+        - 
+        Questions for review:
+        - 
+        """
+
+        notes = generate_notes(transcript, prompt)
     else:
         notes = "Invalid notes type choice."
 
@@ -106,7 +112,7 @@ def process_audio_file(audio_clip, notes_type, chunk_length=60):
     }
 
 # Function to process YouTube URL and generate transcripts
-def process_youtube_link(url, notes_type):
+def process_youtube_link(url, notes_type, keywords):
     yt = YouTube(url)
 
     # Get the best audio stream
@@ -120,26 +126,27 @@ def process_youtube_link(url, notes_type):
 
             # Process audio file in chunks
             audio_clip = AudioFileClip(file_path)
-            return process_audio_file(audio_clip, notes_type)
+            return process_audio_file(audio_clip, notes_type, keywords)
 
     else:
         print("No suitable audio stream found.")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python script.py <choice> <audio_file_or_youtube_link> <notes_type>")
+    if len(sys.argv) != 5:
+        print("Usage: python script.py <choice> <audio_file_or_youtube_link> <notes_type> <keywords>")
         sys.exit(1)
 
     choice = sys.argv[1]
+    keywords = sys.argv[4]
     if choice == '1':
         audio_file_path = sys.argv[2]
         notes_type = sys.argv[3]
         audio_clip = AudioFileClip(audio_file_path)
-        result = process_audio_file(audio_clip, notes_type)
+        result = process_audio_file(audio_clip, notes_type, keywords)
     elif choice == '2':
         url = sys.argv[2]
         notes_type = sys.argv[3]
-        result = process_youtube_link(url, notes_type)
+        result = process_youtube_link(url, notes_type, keywords)
     else:
         print("Invalid choice.")
 
