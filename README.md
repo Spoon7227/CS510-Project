@@ -28,6 +28,7 @@ Before running the application, ensure you have the following installed:
 
     ```bash
     npm install
+    pip install -r requirements.txt
     ```
 
 4. Navigate to the frontend directory:
