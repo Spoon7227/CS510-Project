@@ -43,6 +43,12 @@ Before running the application, ensure you have the following installed:
     npm install
     ```
 
+6. Install `react-scripts`:
+
+    ```bash
+    npm install react-scripts
+    ```
+
 ## Usage
 
 1. Start the backend server:
